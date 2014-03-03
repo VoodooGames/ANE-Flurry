@@ -109,7 +109,7 @@ static id sharedInstance = nil;
     [Flurry setDebugLogEnabled:YES];
     [Flurry startSession:apiKey];
     
-    [FlurryAds enableTestAds:NO];
+    [FlurryAds enableTestAds:YES];
     [FlurryAds setAdDelegate:self];
     [FlurryAds initialize:_applicationWindow.rootViewController];
     
