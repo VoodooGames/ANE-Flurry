@@ -35,6 +35,7 @@ import com.freshplanet.flurry.functions.ads.AddTargetingKeywordFunction;
 import com.freshplanet.flurry.functions.ads.AddUserCookieFunction;
 import com.freshplanet.flurry.functions.ads.ClearCookieFunction;
 import com.freshplanet.flurry.functions.ads.ClearTargetingKeywordsFunction;
+import com.freshplanet.flurry.functions.ads.EnableTestAdsFunction;
 import com.freshplanet.flurry.functions.ads.FetchAdFunction;
 import com.freshplanet.flurry.functions.ads.RemoveAdFunction;
 import com.freshplanet.flurry.functions.ads.ShowAdFunction;
@@ -92,6 +93,7 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 		functionMap.put("clearCookie", new ClearCookieFunction());
 		functionMap.put("addTargetingKeyword", new AddTargetingKeywordFunction());
 		functionMap.put("clearTargetingKeywords", new ClearTargetingKeywordsFunction());
+		functionMap.put("enableTestAds", new EnableTestAdsFunction());
 		
 		return functionMap;	
 	}
@@ -230,5 +232,11 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 	public void onVideoCompleted(String myAdSpaceName)
 	{
 		Log.d(Extension.TAG, "Video opened: " + myAdSpaceName);
+	}
+
+	@Override
+	public void onRendered(String myAdSpaceName)
+	{
+		Log.d(Extension.TAG, "Ad rendered: " + myAdSpaceName);
 	}
 }

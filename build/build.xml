@@ -5,11 +5,12 @@
     <property file="build.config"/>
 
     <!-- All -->
-    <target name="all" depends="ios,android,swc,package" description="Full build of extension"/>
+    <target name="all" depends="ios,android,swc,swf,package" description="Full build of extension"/>
 
     <!-- iOS -->
     <target name="ios" description="Build iOS Library">
-        <mkdir dir="../temp/ios/build/"/>
+		<echo message="Build iOS Library ..."/>
+        <mkdir dir="../bin/ios/build/"/>
 
         <exec executable="xcodebuild" failonerror="true" dir="../ios/">
             <arg line="-project ${name}.xcodeproj"/>
@@ -24,17 +25,19 @@
             <arg line="SYMROOT=../temp/ios/build/"/>
         </exec>
 
-        <copy file="../temp/ios/build/Release-iphoneos/lib${name}.a" todir="../temp/ios" overwrite="true"/>
+        <copy file="../bin/ios/build/Release-iphoneos/lib${name}.a" todir="../bin/ios" overwrite="true"/>
 
-        <delete dir="../temp/ios/build/"/>
+        <delete dir="../bin/ios/build/"/>
+		<echo message="Done."/>
     </target>
 
     <!-- Android -->
     <target name="android" description="Build Android Library">
-        <delete dir="../android/temp"/>
-        <mkdir dir="../android/temp/classes"/>
+		<echo message="Build Android Library ..."/>
+        <delete dir="../bin/android/temp"/>
+        <mkdir dir="../bin/android/temp/classes"/>
 
-        <javac srcdir="../android/src" destdir="../android/temp/classes" includeantruntime="false">
+        <javac srcdir="../android/src" destdir="../bin/android/temp/classes" includeantruntime="false">
             <classpath>
 				<pathelement location="${android.sdk}/android.jar"/>
 				<pathelement location="${flex.sdk}/lib/android/FlashRuntimeExtensions.jar"/>
@@ -42,26 +45,29 @@
                 <pathelement location="../android/libs/Millenial-4.5.1.jar"/>
                 <pathelement location="../android/libs/InMobi-3.0.0.jar"/>
                 <pathelement location="../android/libs/Mobclix-3.2.0.jar"/>
-                <pathelement location="../android/libs/FlurryAgent-3.2.0.jar"/>
+                <pathelement location="../android/libs/flurryAds_3.4.0.jar"/>
+				<pathelement location="../android/libs/flurryAnalytics_3.4.0.jar"/>
 			</classpath>
 		</javac>
 
-        <mkdir dir="../android/temp/zip"/>
-        <unzip src="../android/libs/FlurryAgent-3.2.0.jar" dest="../android/temp/zip"/>
-        <unzip src="../android/libs/GoogleAdMobAdsSdk-6.4.1.jar" dest="../android/temp/zip" />
-        <unzip src="../android/libs/Millenial-4.5.1.jar" dest="../android/temp/zip" />
-        <unzip src="../android/libs/InMobi-3.0.0.jar" dest="../android/temp/zip" />
-        <unzip src="../android/libs/Mobclix-3.2.0.jar" dest="../android/temp/zip" />
-        <copydir src="../android/temp/zip/com" dest="../android/temp/classes/com"/>
+        <mkdir dir="../bin/android/temp/zip"/>
+        <unzip src="../android/libs/flurryAds_3.4.0.jar" dest="../bin/android/temp/zip"/>
+		<unzip src="../android/libs/flurryAnalytics_3.4.0.jar" dest="../bin/android/temp/zip"/>
+        <unzip src="../android/libs/GoogleAdMobAdsSdk-6.4.1.jar" dest="../bin/android/temp/zip" />
+        <unzip src="../android/libs/Millenial-4.5.1.jar" dest="../bin/android/temp/zip" />
+        <unzip src="../android/libs/InMobi-3.0.0.jar" dest="../bin/android/temp/zip" />
+        <unzip src="../android/libs/Mobclix-3.2.0.jar" dest="../bin/ndroid/temp/zip" />
+		<copydir src="../bin/android/temp/zip/com" dest="../bin/android/temp/classes/com"/>
 
-        <mkdir dir="../temp/android/"/>
-        <jar basedir="../android/temp/classes" destfile="../temp/android/lib${name}.jar"/>
-        <delete dir="../android/temp"/>
+        <jar basedir="../bin/android/temp/classes" destfile="../bin/android/lib${name}.jar"/>
+        <delete dir="../bin/android/temp"/>
+		<echo message="Done."/>
     </target>
 
     <!-- Actionscript -->
     <target name="swc" description="Build SWC library">
-        <mkdir dir="../temp/swc/content/"/>
+		<echo message="Build SWC library ..."/>
+        <mkdir dir="../bin/actionscript/"/>
 
         <fileset dir="../actionscript/src" casesensitive="yes" id="classfiles">
             <include name="**/*.as"/>
@@ -73,22 +79,30 @@
 
         <exec executable="${flex.sdk}/bin/compc${bin.ext}" failonerror="true">
             <arg line='-source-path ../actionscript/src'/>
-            <arg line='-output ../temp/swc/${name}.swc'/>
+            <arg line='-output ../bin/actionscript/${name}.swc'/>
             <arg line='-swf-version=14'/>
             <arg line='-external-library-path+="${flex.sdk}/frameworks/libs/air/airglobal.swc"'/>
             <arg line='-include-classes ${classlist}'/>
         </exec>
-
-        <unzip src="../temp/swc/${name}.swc" dest="../temp/swc/content" overwrite="true"/>
-        <copy file="../temp/swc/content/library.swf" todir="../temp/ios" overwrite="true"/>
-        <copy file="../temp/swc/content/library.swf" todir="../temp/android" overwrite="true"/>
-        <copy file="../temp/swc/content/library.swf" todir="../temp/default" overwrite="true"/>
-        <delete dir="../temp/swc/content/"/>
+		<echo message="Done."/>
+	</target>
+	
+	<!-- Propagate library.swf -->
+	<target name="swf" description="Extract and copy library.swf from SWC library">
+		<echo message="Extract and copy library.swf from SWC library ..."/>
+		<mkdir dir="../bin/default"/>
+		<unzip src="../bin/actionscript/${name}.swc" dest="../bin/actionscript/content" overwrite="true"/>
+        <copy file="../bin/actionscript/content/library.swf" todir="../bin/ios" overwrite="true"/>
+        <copy file="../bin/actionscript/content/library.swf" todir="../bin/android" overwrite="true"/>
+        <copy file="../bin/actionscript/content/library.swf" todir="../bin/default" overwrite="true"/>
+        <delete dir="../bin/actionscript/content/"/>
+		<echo message="Done."/>
     </target>
 
     <!-- Package -->
     <target name="package" description="Create the extension package">
-        <exec executable="${flex.sdk}/bin/adt${bin.ext}" failonerror="true" dir="../temp">
+		<echo message="Create the extension package ..."/>
+        <exec executable="${flex.sdk}/bin/adt${bin.ext}" failonerror="true" dir="../bin">
             <arg value="-package"/>
             <arg value="-target"/>
             <arg value="ane"/>
@@ -99,9 +113,7 @@
             <arg line="-platform Android-ARM -C android/ ."/>
             <arg line="-platform default -C default/ ."/>
         </exec>
-
-        <move file="../temp/${name}.ane" todir="../bin"/>
-        <delete dir="../temp"/>
+		<echo message="Done."/>
     </target>
 
 </project>
