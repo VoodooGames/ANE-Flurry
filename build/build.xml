@@ -118,10 +118,9 @@
     </target>
 	
 	<!-- Export -->
-	<target name="export" description="Export the compiled ANE and SWC">
-		<echo message="Export the compiled ANE and SWC"/>
-		<copy file="../bin/${name}.ane" todir="${export.ane.dir}"/>
-		<copy file="../bin/actionscript/${name}.swc" todir="${export.lib.dir}"/>
+	<target name="export" description="Export the compiled ANE">
+		<echo message="Export the compiled ANE"/>
+		<copy file="../bin/${name}.ane" todir="${export.dir}"/>
 		<echo message="Done."/>
 	</target>
 
