@@ -22,7 +22,7 @@
             <arg line="-sdk ${ios.sdkversion}"/>
             <arg line="-alltargets"/>
             <arg line="-configuration Release"/>
-            <arg line="SYMROOT=../temp/ios/build/"/>
+            <arg line="SYMROOT=../bin/ios/build/"/>
         </exec>
 
         <copy file="../bin/ios/build/Release-iphoneos/lib${name}.a" todir="../bin/ios" overwrite="true"/>
@@ -78,6 +78,7 @@
         </pathconvert>
 
         <exec executable="${flex.sdk}/bin/compc${bin.ext}" failonerror="true">
+        	<env key="AIR_SDK_HOME" value="${flex.sdk}"/>
             <arg line='-source-path ../actionscript/src'/>
             <arg line='-output ../bin/actionscript/${name}.swc'/>
             <arg line='-swf-version=14'/>
@@ -108,7 +109,7 @@
             <arg value="ane"/>
             <arg value="${name}.ane"/>
             <arg value="../build/extension.xml"/>
-            <arg line="-swc swc/${name}.swc"/>
+            <arg line="-swc actionscript/${name}.swc"/>
             <arg line="-platform iPhone-ARM -platformoptions ../build/platform.xml -C ios/ ."/>
             <arg line="-platform Android-ARM -C android/ ."/>
             <arg line="-platform default -C default/ ."/>
