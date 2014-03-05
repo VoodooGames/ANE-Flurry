@@ -490,5 +490,15 @@ package com.freshplanet.nativeExtensions
 				extCtx.call("clearTargetingKeywords");
 			}
 		}
+		
+		/**
+		 * Allows you to request test ads from the server.
+		 */
+		public function enableTestAds(enable:Boolean):void {
+			if (isFlurrySupported) {
+				trace("Enabling test ads...");
+				extCtx.call("enableTestAds", enable);
+			}
+		}
 	}
 }

@@ -63,6 +63,7 @@ DEFINE_ANE_FUNCTION(addUserCookie);
 DEFINE_ANE_FUNCTION(clearUserCookies);
 DEFINE_ANE_FUNCTION(addTargetingKeyword);
 DEFINE_ANE_FUNCTION(clearTargetingKeywords);
+DEFINE_ANE_FUNCTION(enableTestAds);
 
 
 // ANE setup

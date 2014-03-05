@@ -109,7 +109,6 @@ static id sharedInstance = nil;
     [Flurry setDebugLogEnabled:YES];
     [Flurry startSession:apiKey];
     
-    [FlurryAds enableTestAds:YES];
     [FlurryAds setAdDelegate:self];
     [FlurryAds initialize:_applicationWindow.rootViewController];
     
@@ -786,6 +785,16 @@ DEFINE_ANE_FUNCTION(clearTargetingKeywords)
     return nil;
 }
 
+DEFINE_ANE_FUNCTION(enableTestAds)
+{
+    BOOL enable;
+    
+    if (FREGetObjectAsBool(argv[0], enable) == FRE_OK)
+        [FlurryAds enableTestAds:enable];
+    
+    return nil;
+}
+
 
 #pragma mark - ANE setup
 
@@ -793,7 +802,7 @@ void AirFlurryContextInitializer(void* extData, const uint8_t* ctxType, FREConte
                                 uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
 {    
     // Register the links btwn AS3 and ObjC. (dont forget to modify the nbFuntionsToLink integer if you are adding/removing functions)
-    NSInteger nbFuntionsToLink = 17;
+    NSInteger nbFuntionsToLink = 18;
     *numFunctionsToTest = nbFuntionsToLink;
     
     FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * nbFuntionsToLink);
@@ -873,6 +882,10 @@ void AirFlurryContextInitializer(void* extData, const uint8_t* ctxType, FREConte
     func[16].name = (const uint8_t*) "clearTargetingKeywords";
     func[16].functionData = NULL;
     func[16].function = &clearTargetingKeywords;
+    
+    func[17].name = (const uint8_t*) "enableTestAds";
+    func[17].functionData = NULL;
+    func[17].function = &enableTestAds;
     
 
     AirFlurryCtx = ctx;
