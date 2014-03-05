@@ -28,10 +28,9 @@ import com.adobe.fre.FRETypeMismatchException;
 import com.adobe.fre.FREWrongThreadException;
 import com.flurry.android.Constants;
 import com.flurry.android.FlurryAgent;
+import com.freshplanet.flurry.Extension;
 
 public class SetUserInfoFunction implements FREFunction {
-
-	private static String TAG = "SetUserInfoFunction";
 
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
@@ -54,12 +53,12 @@ public class SetUserInfoFunction implements FREFunction {
 		
 		if (age > 0)
 		{
-			Log.d(TAG, "age: "+Integer.toString(age));
+			Log.i(Extension.TAG, "age: "+Integer.toString(age));
 
 			FlurryAgent.setAge(age);
 		}  else
 		{
-			Log.d(TAG, "age is null");
+			Log.i(Extension.TAG, "age is null");
 		}
 		
 		String genderString = null;
@@ -68,16 +67,16 @@ public class SetUserInfoFunction implements FREFunction {
 		Boolean hasGender = false;
 		try {
 			genderString = arg1[1].getAsString();
-			Log.d(TAG, "gender: "+genderString);
+			Log.i(Extension.TAG, "gender: "+genderString);
 			if (genderString.compareTo("m") == 0)
 			{
-				Log.d(TAG, "gender Male");
+				Log.i(Extension.TAG, "gender Male");
 				hasGender = true;
 				gender = Constants.MALE;
 			}
 			else if (genderString.compareTo("f") == 0)
 			{
-				Log.d(TAG, "gender Female");
+				Log.i(Extension.TAG, "gender Female");
 				hasGender = true;
 				gender = Constants.FEMALE;
 			}
@@ -99,7 +98,7 @@ public class SetUserInfoFunction implements FREFunction {
 			FlurryAgent.setGender(gender);
 		} else
 		{
-			Log.d(TAG, "gender is null");
+			Log.i(Extension.TAG, "gender is null");
 		}
 
 		return null;

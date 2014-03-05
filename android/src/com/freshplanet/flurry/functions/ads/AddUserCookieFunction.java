@@ -26,6 +26,7 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 import com.flurry.android.FlurryAds;
+import com.freshplanet.flurry.Extension;
 import com.freshplanet.flurry.ExtensionContext;
 
 public class AddUserCookieFunction implements FREFunction
@@ -54,7 +55,7 @@ public class AddUserCookieFunction implements FREFunction
 		}
 		else
 		{
-			Log.d("Flurry", "Cannot add cookies");
+			Log.d(Extension.TAG, "Cannot add cookies");
 		}
 		
 		

@@ -34,8 +34,6 @@ import com.freshplanet.flurry.Extension;
 
 public class LogEventFunction implements FREFunction {
 
-	private static String TAG = "LogEventFunction";
-
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
 		
@@ -71,7 +69,7 @@ public class LogEventFunction implements FREFunction {
 					FREObject value = paramsValue.getObjectAt(i);
 					String keyString = key.getAsString();
 					String valueString = value.getAsString();
-					Log.d(TAG, "["+keyString+"] -> "+valueString);
+					Log.i(Extension.TAG, "["+keyString+"] -> "+valueString);
 					params.put(keyString, valueString);
 				}
 			
@@ -88,19 +86,19 @@ public class LogEventFunction implements FREFunction {
 			}
 		} else if (arg1[1] != null)
 		{
-			Log.e(TAG, "parameterValues is null while parameterKeys is not");
+			Log.e(Extension.TAG, "parameterValues is null while parameterKeys is not");
 		} else if (arg1[2] != null)
 		{
-			Log.e(TAG, "parameterKeys is null while parameterValues is not");
+			Log.e(Extension.TAG, "parameterKeys is null while parameterValues is not");
 		}
 		
 		if (eventName != null) {
 			if (params != null && params.size() > 0) {
-				Log.d(TAG, "log event with params");
+				Log.i(Extension.TAG, "log event with params");
 				FlurryAgent.logEvent(eventName, params);
 				//FlurryAgent.onEvent(eventName, params);
 			} else {
-				Log.d(TAG, "log event without params");
+				Log.i(Extension.TAG, "log event without params");
 				FlurryAgent.logEvent(eventName);
 				//FlurryAgent.onEvent(eventName);
 			}

@@ -42,13 +42,13 @@ public class Extension implements FREExtension
 
 	public void dispose()
 	{
-		Log.d(TAG, "Extension disposed.");
+		Log.i(TAG, "Extension disposed.");
 		context = null;
 	}
 	
 	public void initialize()
 	{
-		Log.d(TAG, "Extension initialized.");
+		Log.i(TAG, "Extension initialized.");
 	}
 	
 	public static RelativeLayout getAdLayout(String space)

@@ -29,11 +29,11 @@ import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
+import com.freshplanet.flurry.Extension;
 import com.freshplanet.flurry.ExtensionContext;
 
 public class StartSessionFunction implements FREFunction
 {
-	private static String TAG = "Flurry - StartSessionFunction";
 	
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1)
@@ -53,14 +53,14 @@ public class StartSessionFunction implements FREFunction
 			// Set Flurry logs
 			FlurryAgent.setLogEnabled(true);
 			FlurryAgent.setLogEvents(true);
-			FlurryAgent.setLogLevel(Log.INFO);
+			FlurryAgent.setLogLevel(Log.DEBUG);
 			
 			// Start Flurry session and initialize ads
 			FlurryAgent.onStartSession(arg0.getActivity(), apiKey);
-			FlurryAds.enableTestAds(false);
+//			FlurryAds.enableTestAds(false);
 			FlurryAds.initializeAds(arg0.getActivity());
 			FlurryAds.setAdListener((ExtensionContext)arg0);
-			Log.d(TAG, "Started session and initalized ads");
+			Log.i(Extension.TAG, "Started session and initalized ads");
 			
 			// Listen to the user location
 			LocationManager locationManager = (LocationManager)(arg0.getActivity().getSystemService(Context.LOCATION_SERVICE));
@@ -74,16 +74,16 @@ public class StartSessionFunction implements FREFunction
 				float longitude = (float)location.getLongitude();
 				FlurryAds.setLocation(latitude, longitude);
 				
-				Log.d(TAG, "Retrieved user location: ("+latitude+", "+longitude+")");
+				Log.i(Extension.TAG, "Retrieved user location: ("+latitude+", "+longitude+")");
 			}
 			else
 			{
-				Log.d(TAG, "Couldn't retrieve user location (locationProvider = " + locationProvider + ")");
+				Log.i(Extension.TAG, "Couldn't retrieve user location (locationProvider = " + locationProvider + ")");
 			}
 		}
 		else
 		{
-			Log.e(TAG, "API Key is null");
+			Log.e(Extension.TAG, "API Key is null");
 		}
 		
 		return null;

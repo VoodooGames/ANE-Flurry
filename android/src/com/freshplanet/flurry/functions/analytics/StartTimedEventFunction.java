@@ -27,17 +27,15 @@ import com.adobe.fre.FREObject;
 import com.adobe.fre.FRETypeMismatchException;
 import com.adobe.fre.FREWrongThreadException;
 import com.flurry.android.FlurryAgent;
+import com.freshplanet.flurry.Extension;
 
 public class StartTimedEventFunction implements FREFunction {
-
-	
-	private static String TAG = "StartTimedEventFunction";
 	
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
 
 		String eventName = null;
-		Log.d(TAG, "starting time event");
+		Log.i(Extension.TAG, "starting time event");
 		try {
 			eventName = arg1[0].getAsString();
 		} catch (IllegalStateException e) {
@@ -54,10 +52,10 @@ public class StartTimedEventFunction implements FREFunction {
 		
 		
 		if (eventName != null) {
-			Log.d(TAG, "timed event name "+eventName);
+			Log.i(Extension.TAG, "timed event name "+eventName);
 			FlurryAgent.logEvent(eventName, true);
 		} else {
-			Log.d(TAG, "null event name");
+			Log.i(Extension.TAG, "null event name");
 		}
 
 		

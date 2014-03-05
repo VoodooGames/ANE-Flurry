@@ -35,10 +35,11 @@ import com.freshplanet.flurry.functions.ads.AddTargetingKeywordFunction;
 import com.freshplanet.flurry.functions.ads.AddUserCookieFunction;
 import com.freshplanet.flurry.functions.ads.ClearCookieFunction;
 import com.freshplanet.flurry.functions.ads.ClearTargetingKeywordsFunction;
+import com.freshplanet.flurry.functions.ads.DisplayAdFunction;
 import com.freshplanet.flurry.functions.ads.EnableTestAdsFunction;
 import com.freshplanet.flurry.functions.ads.FetchAdFunction;
+import com.freshplanet.flurry.functions.ads.IsAdReadyFunction;
 import com.freshplanet.flurry.functions.ads.RemoveAdFunction;
-import com.freshplanet.flurry.functions.ads.ShowAdFunction;
 import com.freshplanet.flurry.functions.analytics.LogErrorFunction;
 import com.freshplanet.flurry.functions.analytics.LogEventFunction;
 import com.freshplanet.flurry.functions.analytics.SetAppVersionFunction;
@@ -56,18 +57,17 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 	
 	private Map<String, String> _userCookies = null;
 	private Map<String, String> _targetingKeywords = null;
-	private Map<String, Boolean> _spacesStatus = null;
 	
 
 	public ExtensionContext()
 	{
-		Log.d(Extension.TAG, "Context created.");
+		Log.i(Extension.TAG, "Context created.");
 	}
 	
 	@Override
 	public void dispose()
 	{
-		Log.d(Extension.TAG, "Context disposed.");
+		Log.i(Extension.TAG, "Context disposed.");
 		Extension.context = null;
 	}
 
@@ -86,14 +86,15 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 		functionMap.put("startTimedEvent", new StartTimedEventFunction());
 		functionMap.put("stopTimedEvent", new StopTimedEventFunction());
 		
-		functionMap.put("showAd", new ShowAdFunction());
+		functionMap.put("enableTestAds", new EnableTestAdsFunction());
 		functionMap.put("fetchAd", new FetchAdFunction());
+		functionMap.put("isAdReady", new IsAdReadyFunction());
+		functionMap.put("displayAd", new DisplayAdFunction());
 		functionMap.put("removeAd", new RemoveAdFunction());
 		functionMap.put("addUserCookie", new AddUserCookieFunction());
 		functionMap.put("clearCookie", new ClearCookieFunction());
 		functionMap.put("addTargetingKeyword", new AddTargetingKeywordFunction());
 		functionMap.put("clearTargetingKeywords", new ClearTargetingKeywordsFunction());
-		functionMap.put("enableTestAds", new EnableTestAdsFunction());
 		
 		return functionMap;	
 	}
@@ -147,96 +148,77 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 		return _targetingKeywords;
 	}
 	
-	// Spaces status (true when a space should be displayed, false otherwise)
 	
-	private Map<String, Boolean> spacesStatus()
-	{
-		if (_spacesStatus == null)
-		{
-			_spacesStatus = new HashMap<String, Boolean>();
-		}
-		
-		return _spacesStatus;
-	}
-	
-	public Boolean getStatusForSpace(String space)
-	{
-		return this.spacesStatus().containsKey(space) ? this.spacesStatus().get(space) : false;
-	}
-	
-	public void setStatusForSpace(Boolean status, String space)
-	{
-		this.spacesStatus().put(space, status);
-	}
-	
-	
-	// Flurry IListener
-	
-	@Override
-	public void onRenderFailed(String myAdSpaceName)
-	{
-		Log.d(Extension.TAG, "Ad render failed: " + myAdSpaceName);
-		
-		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RENDER", myAdSpaceName);
-	}
+	//////////////////////
+	// Flurry IListener //
+	//////////////////////
 	
 	@Override
 	public boolean shouldDisplayAd(String myAdSpaceName, FlurryAdType type)
 	{
-		return getStatusForSpace(myAdSpaceName);
+		return true;
+	}
+	
+	@Override
+	public void onRenderFailed(String myAdSpaceName)
+	{
+		Log.i(Extension.TAG, "Ad render failed: " + myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RENDER", myAdSpaceName);
 	}
 	
 	@Override
 	public void onAdClosed(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Closed ad: " + myAdSpaceName);
-		
+		Log.i(Extension.TAG, "Closed ad: " + myAdSpaceName);
 		dispatchStatusEventAsync("SPACE_DID_DISMISS", myAdSpaceName);
 	}
 	
 	@Override
 	public void onApplicationExit(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Exit application after clicking on ad: " + myAdSpaceName);
-		
+		Log.i(Extension.TAG, "Exit application after clicking on ad: " + myAdSpaceName);
 		dispatchStatusEventAsync("SPACE_WILL_LEAVE_APPLICATION", myAdSpaceName);
 	}
 	
 	@Override
 	public void spaceDidReceiveAd(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Space did receive ad: " + myAdSpaceName);
+		Log.i(Extension.TAG, "Space did receive ad: " + myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_DID_RECEIVE_AD", myAdSpaceName);
 	}
 	
 	@Override
 	public void spaceDidFailToReceiveAd(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Space did fail to receive ad: " + myAdSpaceName);
-		
-		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RENDER", myAdSpaceName);
+		Log.i(Extension.TAG, "Space did fail to receive ad: " + myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
 	}
 	
 	@Override
 	public void onAdOpened(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Ad opened: " + myAdSpaceName);
+		Log.i(Extension.TAG, "Ad opened: " + myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
 	}
 	
 	@Override
 	public void onAdClicked(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Ad clicked: " + myAdSpaceName);
+		Log.i(Extension.TAG, "Ad clicked: " + myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
 	}
 	
 	@Override 
 	public void onVideoCompleted(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Video opened: " + myAdSpaceName);
+		Log.i(Extension.TAG, "Video opened: " + myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
 	}
 
 	@Override
 	public void onRendered(String myAdSpaceName)
 	{
-		Log.d(Extension.TAG, "Ad rendered: " + myAdSpaceName);
+		Log.i(Extension.TAG, "Ad rendered: " + myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
 	}
 }

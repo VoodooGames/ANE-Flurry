@@ -27,16 +27,15 @@ import com.adobe.fre.FREObject;
 import com.adobe.fre.FRETypeMismatchException;
 import com.adobe.fre.FREWrongThreadException;
 import com.flurry.android.FlurryAgent;
+import com.freshplanet.flurry.Extension;
 
 public class StopTimedEventFunction implements FREFunction {
-
-	private static String TAG = "StopTimedEventFunction";
 
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
 
 		String eventName = null;
-		Log.d(TAG, "stopping time event");
+		Log.i(Extension.TAG, "stopping time event");
 		try {
 			eventName = arg1[0].getAsString();
 		} catch (IllegalStateException e) {
@@ -52,10 +51,10 @@ public class StopTimedEventFunction implements FREFunction {
 		}
 
 		if (eventName != null) {
-			Log.d(TAG, "timed event name "+eventName);
+			Log.i(Extension.TAG, "timed event name "+eventName);
 			FlurryAgent.endTimedEvent(eventName);
 		} else {
-			Log.d(TAG, "null event name");
+			Log.i(Extension.TAG, "null event name");
 		}
 		
 		return null;

@@ -27,10 +27,9 @@ import com.adobe.fre.FREObject;
 import com.adobe.fre.FRETypeMismatchException;
 import com.adobe.fre.FREWrongThreadException;
 import com.flurry.android.FlurryAgent;
+import com.freshplanet.flurry.Extension;
 
 public class SetUserIdFunction implements FREFunction {
-
-	private static String TAG = "SetUserIdFunction";
 
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
@@ -56,7 +55,7 @@ public class SetUserIdFunction implements FREFunction {
 			FlurryAgent.setUserId(userId);
 		} else
 		{
-			Log.e(TAG, "user id is null");
+			Log.e(Extension.TAG, "user id is null");
 		}
 
 		

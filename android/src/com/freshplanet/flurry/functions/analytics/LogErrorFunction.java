@@ -26,11 +26,10 @@ import com.adobe.fre.FREObject;
 import com.adobe.fre.FRETypeMismatchException;
 import com.adobe.fre.FREWrongThreadException;
 import com.flurry.android.FlurryAgent;
+import com.freshplanet.flurry.Extension;
 
 
 public class LogErrorFunction implements FREFunction {
-
-	private static String TAG = "LogErrorFunction";
 
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1) {
@@ -73,7 +72,7 @@ public class LogErrorFunction implements FREFunction {
 			FlurryAgent.onError(errorId, message, "");
 		} else
 		{
-			Log.e(TAG, "errorId is null");
+			Log.e(Extension.TAG, "errorId is null");
 		}
 
 		

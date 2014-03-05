@@ -37,7 +37,7 @@
         <delete dir="../bin/android/temp"/>
         <mkdir dir="../bin/android/temp/classes"/>
 
-        <javac srcdir="../android/src" destdir="../bin/android/temp/classes" includeantruntime="false" target="1.6" source="1.6">
+        <javac srcdir="../android/src" destdir="../bin/android/temp/classes" includeantruntime="false" target="1.6" source="1.6" fork="yes" executable="${jdk}/bin/javac${bin.ext}">
             <classpath>
 				<pathelement location="${android.sdk}/android.jar"/>
 				<pathelement location="${flex.sdk}/lib/android/FlashRuntimeExtensions.jar"/>

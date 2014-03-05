@@ -25,11 +25,11 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
 import com.flurry.android.FlurryAds;
+import com.freshplanet.flurry.Extension;
 import com.freshplanet.flurry.ExtensionContext;
 
 public class RemoveAdFunction implements FREFunction
 {
-	private static String TAG = "Flurry - RemoveAdFunction";
 	
 	@Override
 	public FREObject call(FREContext arg0, FREObject[] arg1)
@@ -43,17 +43,16 @@ public class RemoveAdFunction implements FREFunction
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			Log.d(TAG, "Couldn't retrieve ad space. Ad won't be removed.");
+			Log.d(Extension.TAG, "Couldn't retrieve ad space. Ad won't be removed.");
 			return null;
 		}
 		
 		// Update space status
 		ExtensionContext context = (ExtensionContext)arg0;
-		context.setStatusForSpace(false, space);
 		
 		// Remove the ad
-		RelativeLayout adLayout = ((ExtensionContext)arg0).getCurrentAdLayout();
-		FlurryAds.removeAd(arg0.getActivity(), space, adLayout);
+		RelativeLayout adLayout = context.getCurrentAdLayout();
+		FlurryAds.removeAd(context.getActivity(), space, adLayout);
 		
 		return null;
 	}

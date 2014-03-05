@@ -27,29 +27,43 @@ package com.freshplanet.nativeExtensions
 	import flash.utils.getTimer;
 
 	/**
-	 * Class handling all frontend analytics 
-	 * @author titi
-	 * 
+	 * Singleton managing both Flurry Analytics and Ads. First set your API keys, then, create the instance you will 
+	 * use with <code>getInstance()</code>.
 	 */
 	public class Flurry extends EventDispatcher
 	{
-				
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		// SINGLETON SECTION
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		
+		/** The Singleton instance. */
 		private static var _instance:Flurry;
 		
+		/** The Native Extension context. */
 		private var extCtx:ExtensionContext;
 		
-		public function Flurry() 
+		/**
+		 * Set this to your own logging function. Signature : function(message:String):void.
+		 */
+		public static var logger:Function = trace;
+		
+		/**
+		 * Do not call this, use <code>getInstance()</code> instead.
+		 */
+		public function Flurry()
 		{
 			if (!_instance)
 			{
 				if (this.isFlurrySupported)
 				{
-					trace('[Flurry] creating Flurry context');
+					log('creating Flurry context');
 					extCtx = ExtensionContext.createExtensionContext("com.freshplanet.AirFlurry", null);
 					extCtx.addEventListener(StatusEvent.STATUS, onStatus);
 				} else
 				{
-					trace('[Flurry] Flurry is not supported', "no log will be displayed");
+					log('Flurry is not supported', "no log will be displayed");
 				}
 				_instance = this;
 			}
@@ -64,26 +78,19 @@ package com.freshplanet.nativeExtensions
 		{
 			var e:FlurryAdsEvent;
 			
-			switch(event.code)
-			{
-				case FlurryAdsEvent.SPACE_DID_DISMISS:
-					e = new FlurryAdsEvent(FlurryAdsEvent.SPACE_DID_DISMISS, event.level);
-					break;
-				case FlurryAdsEvent.SPACE_WILL_LEAVE_APPLICATION:
-					e = new FlurryAdsEvent(FlurryAdsEvent.SPACE_WILL_LEAVE_APPLICATION, event.level);
-					break;
-				case FlurryAdsEvent.SPACE_DID_FAIL_TO_RENDER:
-					e = new FlurryAdsEvent(FlurryAdsEvent.SPACE_DID_FAIL_TO_RENDER, event.level);
-					break;
-				case "LOGGING":
-					trace('[Flurry] ' + event.level);
-					break;	
+			if(event.code == "LOGGING") {
+				log(event.level);
+				return;
 			}
 			
-			if (e) dispatchEvent(e);
+			e = new FlurryAdsEvent(event.code, event.level);
+			
+			if(e) dispatchEvent(e);
 		}
 		
-		
+		/**
+		 * Returns the Singleton instance.
+		 */
 		public static function getInstance() : Flurry
 		{
 			return _instance ? _instance : new Flurry();
@@ -104,8 +111,24 @@ package com.freshplanet.nativeExtensions
 			var result:Boolean = this.isIOS || this.isAndroid;
 			return result;
 		}
-
 		
+		/**
+		 * Outputs the given message(s) using the provided logger function, or using trace.
+		 */
+		private static function log(message:String, ... additionnalMessages):void {
+			if(logger == null) return;
+			
+			if(!additionnalMessages)
+				additionnalMessages = [];
+			
+			logger(message + additionnalMessages.join(" "));
+		}
+		
+		
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		// ANALYTICS SECTION
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		/**
 		 * Log an event (not timed). For timed events, @see startTimedEvent
@@ -124,13 +147,13 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function logEvent(eventName:String, properties:Object = null):void
 		{
-			trace("[Flurry]", "logEvent", eventName, properties);
+			log("logEvent", eventName, properties);
 
 			if (isFlurrySupported)
 			{
 				if (!checkLength(eventName))
 				{
-					trace("[Flurry Warning]", "event name too long (>255 characters)", eventName);
+					log("Warning : event name too long (>255 characters)", eventName);
 					return;
 				}
 
@@ -144,7 +167,7 @@ package com.freshplanet.nativeExtensions
 					{
 						if (count > 10)
 						{
-							trace("[Flurry Warning]", "too many properties sent (>10) for event", eventName);
+							log("Warning : too many properties sent (>10) for event", eventName);
 							break;
 						}
 						value = properties[key].toString();
@@ -154,15 +177,15 @@ package com.freshplanet.nativeExtensions
 							parameterValues.push(value);
 						} else
 						{
-							trace("[Flurry Warning]", "key or value too long (>255 characters)", key, value);
+							log("Warning : key or value too long (>255 characters)", key, value);
 						}
 						count++;
 					}
-					trace("[Flurry]", "logEvent", eventName, parameterKeys, parameterValues);
+					log("logEvent", eventName, parameterKeys, parameterValues);
 					extCtx.call("logEvent", eventName, parameterKeys, parameterValues);
 				} else
 				{
-					trace("[Flurry]", "logEvent", eventName);
+					log("logEvent", eventName);
 					extCtx.call("logEvent", eventName, [], []);
 				}
 			}
@@ -228,7 +251,7 @@ package com.freshplanet.nativeExtensions
 			{
 				if ([MALE_GENDER, FEMALE_GENDER].indexOf(gender) == -1)
 				{
-					trace("[Flurry]", "wrong gender provided", gender, "must be Flurry.MALE_GENDER or Flurry.FEMALE_GENDER")
+					log("wrong gender provided", gender, "must be Flurry.MALE_GENDER or Flurry.FEMALE_GENDER")
 				}
 				extCtx.call("setUserInfo", age, gender)
 			}
@@ -271,16 +294,16 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function startTimedEvent(eventName:String):void
 		{
-			trace("[Flurry]", "startTimedEvent", eventName);
+			log("startTimedEvent", eventName);
 
 			if (isFlurrySupported)
 			{
 				if (!checkLength(eventName))
 				{
-					trace("[Flurry Warning]", "event name too long (>255 characters)", eventName);
+					log("Warning : event name too long (>255 characters)", eventName);
 					return;
 				}
-				trace("[Flurry]", "start logEvent Timed", eventName);
+				log("start logEvent Timed", eventName);
 
 				extCtx.call("startTimedEvent", eventName)
 			}
@@ -294,16 +317,16 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function stopTimedEvent(eventName:String):void
 		{
-			trace("[Flurry]", "stopTimedEvent", eventName);
+			log("stopTimedEvent", eventName);
 
 			if (isFlurrySupported)
 			{
 				if (!checkLength(eventName))
 				{
-					trace("[Flurry Warning]", "event name too long (>255 characters)", eventName);
+					log("Warning : event name too long (>255 characters)", eventName);
 					return;
 				}
-				trace("[Flurry]", "stop logEvent Timed", eventName);
+				log("stop logEvent Timed", eventName);
 
 				extCtx.call("stopTimedEvent", eventName)
 			}
@@ -311,9 +334,8 @@ package com.freshplanet.nativeExtensions
 
 		
 		/**
-		 * Start a new Flurry Session. 
+		 * Start a new Flurry Session.
 		 * Every event will be recorded afterwards.
-		 * 
 		 */
 		public function startSession():void
 		{
@@ -328,14 +350,13 @@ package com.freshplanet.nativeExtensions
 					extCtx.call("startSession", apiKey)
 				} else
 				{
-					trace("[Flurry Warning]", "api key not found");
+					log("Warning : api key not found");
 				}
 			}
 		}
 		
 		private var iOSApiKey:String;
 		private var androidApiKey:String;
-
 		
 		private function getApiKeyFromDevice():String
 		{
@@ -377,51 +398,42 @@ package com.freshplanet.nativeExtensions
 		// ADS SECTION
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		private var _activeAdSpaces : Array = [];
-		
 		/**
-		 * Display an ad onscreen.
-		 * 
-		 * @param space String: Name of the adSpace that you defined on the Flurry website.
-		 * @param size String: Size of the ad. This is generally overridden on the server-side
-		 * by the size specified on the Flurry website.
-		 * @param timeout int: Maximum time (in ms) ad requests should block before they return.
-		 * For asynchronous requests (recommended for banners), pass 0. (Default: 0)
-		 * @param force Boolean: If true, the ad will be requested no matter what. If false, the
-		 * ad won't be requested if showAd() has been called before for this ad space without
-		 * calling removeAd() afterward. (Default: false).
-		 * 
-		 * @see FlurryAdSize
-		 */ 
-		public function showAd( space : String, size : String, timeout : int = 0, force : Boolean = false ) : Boolean
-		{
-			if (!isFlurrySupported) return false;
-			if (_activeAdSpaces.indexOf(space) != -1 && !force) return true;
-			
-			if (_activeAdSpaces.indexOf(space) == -1) _activeAdSpaces.push(space);
-			
-			trace('[Flurry] Show ad "'+space+'" with size "'+size+'"');
-			
-			return extCtx.call('showAd', space, size, timeout);
-		}
-		
-		/**
-		 * Fetch an ad to be displayed later (with <code>showAd()</code>).
+		 * Fetches an ad to be displayed later (with <code>displayAd()</code>).
 		 * 
 		 * @param space String: Name of the adSpace that you defined on the Flurry website.
 		 * @param size String: Size of the ad. This is generally overridden on the server-side
 		 * by the size specified on the Flurry website.
 		 * 
-		 * @see #showAd()
 		 * @see FlurryAdSize
 		 */
 		public function fetchAd( space : String, size : String ) : void
 		{
 			if (!isFlurrySupported) return;
-			
-			trace('[Flurry] Fetch ad "'+space+'" with size "'+size+'"');
-			
+			log('Fetch ad "'+space+'" with size "'+size+'"');
 			extCtx.call('fetchAd', space, size);
+		}
+		
+		/**
+		 * Returns true if an ad has been fetched and prepared by a previous call to fetchAd().
+		 */
+		public function isAdReady( space : String ) : Boolean {
+			if (!isFlurrySupported) return false;
+			var adReady:Boolean = extCtx.call("isAdReady", space);
+			log("isAdReady(" + space + ") ? " + adReady);
+			return adReady;
+		}
+		
+		/**
+		 * Displays a previously fetched ad (with <code>fetchAd()</code>).
+		 * 
+		 * @param space String: Name the adSpace that you defined on the Flurry website.
+		 */
+		public function displayAd( space : String ) : void
+		{
+			if (!isFlurrySupported) return;
+			log('Display ad "'+space+'"');
+			extCtx.call('displayAd', space);
 		}
 		
 		/**
@@ -432,12 +444,7 @@ package com.freshplanet.nativeExtensions
 		public function removeAd( space : String ) : void
 		{
 			if (!isFlurrySupported) return;
-			
-			if (_activeAdSpaces.indexOf(space) != -1)
-				_activeAdSpaces.splice(_activeAdSpaces.indexOf(space), 1);
-			
-			trace('[Flurry] Remove ad "'+space+'"');
-			
+			log('Remove ad "'+space+'"');
 			extCtx.call('removeAd', space);
 		}
 		
@@ -447,10 +454,8 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function addUserCookie( key : String, value : String ) : void
 		{
-			if (isFlurrySupported)
-			{
-				extCtx.call("addUserCookie", key, value);
-			}
+			if (!isFlurrySupported) return;
+			extCtx.call("addUserCookie", key, value);
 		}
 		
 		/**
@@ -460,10 +465,8 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function clearUserCookies() : void
 		{
-			if (isFlurrySupported)
-			{
-				extCtx.call("clearUserCookies");
-			}
+			if (!isFlurrySupported) return;
+			extCtx.call("clearUserCookies");
 		}
 		
 		/**
@@ -472,10 +475,8 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function addTargetingKeyword( key : String, value : String ) : void
 		{
-			if (isFlurrySupported)
-			{
-				extCtx.call("addTargetingKeyword", key, value);
-			}
+			if (!isFlurrySupported) return;
+			extCtx.call("addTargetingKeyword", key, value);
 		}
 		
 		/**
@@ -485,20 +486,17 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function clearTargetingKeywords() : void
 		{
-			if (isFlurrySupported)
-			{
-				extCtx.call("clearTargetingKeywords");
-			}
+			if (!isFlurrySupported) return;
+			extCtx.call("clearTargetingKeywords");
 		}
 		
 		/**
 		 * Allows you to request test ads from the server.
 		 */
 		public function enableTestAds(enable:Boolean):void {
-			if (isFlurrySupported) {
-				trace("Enabling test ads...");
-				extCtx.call("enableTestAds", enable);
-			}
+			if (!isFlurrySupported) return;
+			log("Enabling test ads...");
+			extCtx.call("enableTestAds", enable);
 		}
 	}
 }
