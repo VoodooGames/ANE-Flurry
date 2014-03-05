@@ -31,7 +31,7 @@
 - (void)startSession:(NSString *)apiKey;
 
 // Ads
-- (BOOL)showAdForSpace:(NSString *)space size:(FlurryAdSize)size timeout:(int64_t)timeout;
+- (void)displayAdForSpace:(NSString *)space size:(FlurryAdSize)size;
 - (void)fetchAdForSpace:(NSString *)space size:(FlurryAdSize)size;
 - (void)removeAdFromSpace:(NSString *)space;
 - (void)addUserCookieWithValue:(NSString *)value forKey:(NSString *)key;
@@ -56,8 +56,9 @@ DEFINE_ANE_FUNCTION(stopSession);
 
 
 // C interface - Ads
-DEFINE_ANE_FUNCTION(showAd);
 DEFINE_ANE_FUNCTION(fetchAd);
+DEFINE_ANE_FUNCTION(isAdReady);
+DEFINE_ANE_FUNCTION(displayAd);
 DEFINE_ANE_FUNCTION(removeAd);
 DEFINE_ANE_FUNCTION(addUserCookie);
 DEFINE_ANE_FUNCTION(clearUserCookies);

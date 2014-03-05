@@ -16,6 +16,12 @@ package com.freshplanet.nativeExtensions
 		/** Android only. */
 		public static const SPACE_AD_RENDERED:String = "SPACE_AD_RENDERED";
 		
+		// IOS ONLY
+		public static const SPACE_WILL_DISMISS:String = "SPACE_WILL_DISMISS";
+		public static const SPACE_WILL_EXPAND:String = "SPACE_WILL_EXPAND";
+		public static const SPACE_WILL_COLLAPSE:String = "SPACE_WILL_COLLAPSE";
+		public static const SPACE_DID_COLLAPSE:String = "SPACE_DID_COLLAPSE";
+		
 		/** Name of the ad space related to the event. */
 		public var adSpace:String;
 		

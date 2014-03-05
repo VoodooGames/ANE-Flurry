@@ -21,7 +21,6 @@
 
 FREContext AirFlurryCtx = nil;
 
-
 @interface AirFlurry ()
 {
     UIWindow *_applicationWindow;
@@ -182,7 +181,7 @@ static id sharedInstance = nil;
     [self.spacesStatus setObject:[NSNumber numberWithBool:status] forKey:space];
 }
 
-- (BOOL)showAdForSpace:(NSString *)space size:(FlurryAdSize)size timeout:(int64_t)timeout
+- (void)displayAdForSpace:(NSString *)space size:(FlurryAdSize)size
 {
     UIView *adView = (size == FULLSCREEN) ? self.rootView : self.bannerContainer;
     
@@ -193,26 +192,10 @@ static id sharedInstance = nil;
         adView.frame = bannerFrame;
     }
     
-    if ([FlurryAds adReadyForSpace:space]) // if ad is ready, show it
-    {
-        [self setStatus:YES forSpace:space];
-        if (size == FULLSCREEN) _interstitialDisplayed = [space retain];
-        else [self.rootView addSubview:adView];
-        [FlurryAds displayAdForSpace:space onView:adView];
-        return YES;
-    }
-    else if (timeout == 0) // else if async display requested, fetch then show
-    {
-        [self setStatus:YES forSpace:space];
-        if (size == FULLSCREEN) _interstitialDisplayed = [space retain];
-        else [self.rootView addSubview:adView];
-        [FlurryAds fetchAndDisplayAdForSpace:space view:adView size:size];
-        return YES;
-    }
-    else // else, ad unavailable
-    {
-        return NO;
-    }
+    [self setStatus:YES forSpace:space];
+    if (size == FULLSCREEN) _interstitialDisplayed = [space retain];
+    else [self.rootView addSubview:adView];
+    [FlurryAds displayAdForSpace:space onView:adView];
 }
 
 - (void)fetchAdForSpace:(NSString *)space size:(FlurryAdSize)size
@@ -282,9 +265,48 @@ static id sharedInstance = nil;
 
 #pragma mark - FlurryAdDelegate
 
+- (void) spaceDidReceiveAd:(NSString*)adSpace
+{
+    NSLog(@"[Flurry] Space did receive ad : %@", adSpace);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_DID_RECEIVE_AD", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
+- (void) spaceDidFailToReceiveAd:(NSString*)adSpace error:(NSError *)error
+{
+    NSLog(@"[Flurry] Space failed to receive ad : %@. Error : %@", adSpace, [error description]);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_DID_FAIL_TO_RECEIVE_AD", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
 - (BOOL)spaceShouldDisplay:(NSString *)adSpace interstitial:(BOOL)interstitial
 {
-    return [self statusForSpace:adSpace];
+    return YES;
+}
+
+- (void)spaceDidFailToRender:(NSString *)adSpace error:(NSError *)error
+{
+    NSLog(@"[Flurry] Ad failed to render: %@. Error: %@", adSpace, [error localizedDescription]);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_DID_FAIL_TO_RENDER", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
+- (void)spaceWillDismiss:(NSString *)adSpace interstitial:(BOOL)interstitial {
+    NSLog(@"[Flurry] Space will dismiss : %@. ", adSpace);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_WILL_DISMISS", (const uint8_t *)[adSpace UTF8String]);
+    }
 }
 
 - (void)spaceDidDismiss:(NSString *)adSpace interstitial:(BOOL)interstitial
@@ -307,15 +329,57 @@ static id sharedInstance = nil;
     }
 }
 
-- (void)spaceDidFailToRender:(NSString *)space error:(NSError *)error
+- (void)spaceWillExpand:(NSString *)adSpace
 {
-    NSLog(@"[Flurry] Ad failed to render: %@. Error: %@", space, [error localizedDescription]);
+    NSLog(@"[Flurry] Space will expand : %@", adSpace);
     
     if (AirFlurryCtx != nil)
     {
-        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_DID_FAIL_TO_RENDER", (const uint8_t *)[space UTF8String]);
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_WILL_EXPAND", (const uint8_t *)[adSpace UTF8String]);
     }
 }
+
+- (void)spaceWillCollapse:(NSString *)adSpace
+{
+    NSLog(@"[Flurry] Space will collapse : %@", adSpace);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_WILL_COLLAPSE", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
+- (void)spaceDidCollapse:(NSString *)adSpace
+{
+    NSLog(@"[Flurry] Space did collapse : %@", adSpace);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_DID_COLLAPSE", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
+- (void) spaceDidReceiveClick:(NSString*)adSpace
+{
+    NSLog(@"[Flurry] Space did receive click : %@", adSpace);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_AD_CLICKED", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
+- (void)videoDidFinish:(NSString *)adSpace
+{
+    NSLog(@"[Flurry] Video did finish for space : %@", adSpace);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_VIDEO_COMPLETED", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
+
 
 
 #pragma mark - FlurryAdDelegate - 3rd-party networks
@@ -607,7 +671,7 @@ DEFINE_ANE_FUNCTION(stopTimedEvent)
 
 #pragma mark - C interface - Ads
 
-DEFINE_ANE_FUNCTION(showAd)
+/*DEFINE_ANE_FUNCTION(showAd)
 {
     NSString *space = nil;
     FlurryAdSize sizeValue;
@@ -667,7 +731,7 @@ DEFINE_ANE_FUNCTION(showAd)
     }
     
     return nil;
-}
+}*/
 
 DEFINE_ANE_FUNCTION(fetchAd)
 {
@@ -702,6 +766,59 @@ DEFINE_ANE_FUNCTION(fetchAd)
     {
         [[AirFlurry sharedInstance] fetchAdForSpace:space size:sizeValue];
     }
+    
+    return nil;
+}
+
+DEFINE_ANE_FUNCTION(isAdReady)
+{
+    NSString *space = nil;
+    uint32_t stringLength;
+    
+    // Retrieve the ad space name
+    const uint8_t *spaceString;
+    if (FREGetObjectAsUTF8(argv[0], &stringLength, &spaceString) == FRE_OK)
+    {
+        space = [NSString stringWithUTF8String:(char*)spaceString];
+    }
+    
+    FREObject result;
+    FRENewObjectFromBool([FlurryAds adReadyForSpace:space], result);
+    return result;
+}
+
+DEFINE_ANE_FUNCTION(displayAd)
+{
+    NSString *space = nil;
+    FlurryAdSize sizeValue;
+    uint32_t stringLength;
+    
+    // Retrieve the ad space name
+    const uint8_t *spaceString;
+    if (FREGetObjectAsUTF8(argv[0], &stringLength, &spaceString) != FRE_OK) {
+        NSLog(@"[Flurry] Could not retrieve space.");
+        return nil;
+    }
+    
+    space = [NSString stringWithUTF8String:(char*)spaceString];
+    
+    // Retrieve the ad size
+    const uint8_t *sizeString;
+    if (FREGetObjectAsUTF8(argv[1], &stringLength, &sizeString) == FRE_OK)
+    {
+        NSString *size = [NSString stringWithUTF8String:(char*)sizeString];
+        
+        if ([size isEqualToString:@"BANNER_TOP"]) sizeValue = BANNER_TOP;
+        else if ([size isEqualToString:@"BANNER_BOTTOM"]) sizeValue = BANNER_BOTTOM;
+        else sizeValue = FULLSCREEN;
+    }
+    else
+    {
+        NSLog(@"[Flurry] showAd - Couldn't retrieve ad size. Defaulting to fullscreen.");
+        sizeValue = FULLSCREEN;
+    }
+
+    [[AirFlurry sharedInstance] displayAdForSpace:space size:sizeValue];
     
     return nil;
 }
@@ -800,97 +917,38 @@ DEFINE_ANE_FUNCTION(enableTestAds)
 
 void AirFlurryContextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, 
                                 uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet) 
-{    
-    // Register the links btwn AS3 and ObjC. (dont forget to modify the nbFuntionsToLink integer if you are adding/removing functions)
-    NSInteger nbFuntionsToLink = 18;
-    *numFunctionsToTest = nbFuntionsToLink;
+{
+    static FRENamedFunction functionMap[] = {
+        // Session
+        MAP_FUNCTION(startSession, NULL),
+        MAP_FUNCTION(stopSession, NULL),
+        
+        // Analytics
+        MAP_FUNCTION(setAppVersion, NULL),
+        MAP_FUNCTION(logEvent, NULL),
+        MAP_FUNCTION(logError, NULL),
+        MAP_FUNCTION(setUserId, NULL),
+        MAP_FUNCTION(setUserInfo, NULL),
+        MAP_FUNCTION(setSendEventsOnPause, NULL),
+        MAP_FUNCTION(startTimedEvent, NULL),
+        MAP_FUNCTION(stopTimedEvent, NULL),
+        
+        // Ads
+        MAP_FUNCTION(fetchAd, NULL),
+        MAP_FUNCTION(isAdReady, NULL),
+        MAP_FUNCTION(displayAd, NULL),
+        MAP_FUNCTION(removeAd, NULL),
+        MAP_FUNCTION(addUserCookie, NULL),
+        MAP_FUNCTION(clearUserCookies, NULL),
+        MAP_FUNCTION(addTargetingKeyword, NULL),
+        MAP_FUNCTION(clearTargetingKeywords, NULL),
+        MAP_FUNCTION(enableTestAds, NULL)
+    };
     
-    FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * nbFuntionsToLink);
-    
-    // Session
-    
-    func[0].name = (const uint8_t*) "startSession";
-    func[0].functionData = NULL;
-    func[0].function = &startSession;
-    
-    func[1].name = (const uint8_t*) "stopSession";
-    func[1].functionData = NULL;
-    func[1].function = &stopSession;
-    
-    
-    // Analytics
-    
-    func[2].name = (const uint8_t*) "setAppVersion";
-    func[2].functionData = NULL;
-    func[2].function = &setAppVersion;
-    
-    func[3].name = (const uint8_t*) "logEvent";
-    func[3].functionData = NULL;
-    func[3].function = &logEvent;
-    
-    func[4].name = (const uint8_t*) "logError";
-    func[4].functionData = NULL;
-    func[4].function = &logError;
-    
-    func[5].name = (const uint8_t*) "setUserId";
-    func[5].functionData = NULL;
-    func[5].function = &setUserId;
-
-    func[6].name = (const uint8_t*) "setUserInfo";
-    func[6].functionData = NULL;
-    func[6].function = &setUserInfo;
-
-    func[7].name = (const uint8_t*) "setSendEventsOnPause";
-    func[7].functionData = NULL;
-    func[7].function = &setSendEventsOnPause;
-
-    func[8].name = (const uint8_t*) "startTimedEvent";
-    func[8].functionData = NULL;
-    func[8].function = &startTimedEvent;
-
-    func[9].name = (const uint8_t*) "stopTimedEvent";
-    func[9].functionData = NULL;
-    func[9].function = &stopTimedEvent;
-
-    
-    // Ads
-    
-    func[10].name = (const uint8_t*) "showAd";
-    func[10].functionData = NULL;
-    func[10].function = &showAd;
-    
-    func[11].name = (const uint8_t*) "fetchAd";
-    func[11].functionData = NULL;
-    func[11].function = &fetchAd;
-    
-    func[12].name = (const uint8_t*) "removeAd";
-    func[12].functionData = NULL;
-    func[12].function = &removeAd;
-    
-    func[13].name = (const uint8_t*) "addUserCookie";
-    func[13].functionData = NULL;
-    func[13].function = &addUserCookie;
-    
-    func[14].name = (const uint8_t*) "clearUserCookies";
-    func[14].functionData = NULL;
-    func[14].function = &clearUserCookies;
-    
-    func[15].name = (const uint8_t*) "addTargetingKeyword";
-    func[15].functionData = NULL;
-    func[15].function = &addTargetingKeyword;
-    
-    func[16].name = (const uint8_t*) "clearTargetingKeywords";
-    func[16].functionData = NULL;
-    func[16].function = &clearTargetingKeywords;
-    
-    func[17].name = (const uint8_t*) "enableTestAds";
-    func[17].functionData = NULL;
-    func[17].function = &enableTestAds;
-    
+	*numFunctionsToTest = sizeof( functionMap ) / sizeof( FRENamedFunction );
+	*functionsToSet = functionMap;
 
     AirFlurryCtx = ctx;
-    
-    *functionsToSet = func;
 }
 
 void AirFlurryContextFinalizer(FREContext ctx) {}

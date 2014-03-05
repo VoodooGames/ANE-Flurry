@@ -429,11 +429,11 @@ package com.freshplanet.nativeExtensions
 		 * 
 		 * @param space String: Name the adSpace that you defined on the Flurry website.
 		 */
-		public function displayAd( space : String ) : void
+		public function displayAd( space : String, size : String ) : void
 		{
 			if (!isFlurrySupported) return;
-			log('Display ad "'+space+'"');
-			extCtx.call('displayAd', space);
+			log('Display ad "'+space+'" with size "' + size + '"');
+			extCtx.call('displayAd', space, size);
 		}
 		
 		/**
