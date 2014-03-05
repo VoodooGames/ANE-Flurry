@@ -37,7 +37,7 @@
         <delete dir="../bin/android/temp"/>
         <mkdir dir="../bin/android/temp/classes"/>
 
-        <javac srcdir="../android/src" destdir="../bin/android/temp/classes" includeantruntime="false">
+        <javac srcdir="../android/src" destdir="../bin/android/temp/classes" includeantruntime="false" target="1.6" source="1.6">
             <classpath>
 				<pathelement location="${android.sdk}/android.jar"/>
 				<pathelement location="${flex.sdk}/lib/android/FlashRuntimeExtensions.jar"/>
@@ -103,7 +103,7 @@
     <!-- Package -->
     <target name="package" description="Create the extension package">
 		<echo message="Create the extension package ..."/>
-        <exec executable="${flex.sdk}/bin/adt${bin.ext}" failonerror="true" dir="../bin">
+        <exec executable="${flex.sdk}/bin/adt${bat.ext}" failonerror="true" dir="../bin">
             <arg value="-package"/>
             <arg value="-target"/>
             <arg value="ane"/>
@@ -116,5 +116,13 @@
         </exec>
 		<echo message="Done."/>
     </target>
+	
+	<!-- Export -->
+	<target name="export" description="Export the compiled ANE and SWC">
+		<echo message="Export the compiled ANE and SWC"/>
+		<copy file="../bin/${name}.ane" todir="${export.ane.dir}"/>
+		<copy file="../bin/actionscript/${name}.swc" todir="${export.lib.dir}"/>
+		<echo message="Done."/>
+	</target>
 
 </project>
