@@ -56,7 +56,7 @@
         <unzip src="../android/libs/GoogleAdMobAdsSdk-6.4.1.jar" dest="../bin/android/temp/zip" />
         <unzip src="../android/libs/Millenial-4.5.1.jar" dest="../bin/android/temp/zip" />
         <unzip src="../android/libs/InMobi-3.0.0.jar" dest="../bin/android/temp/zip" />
-        <unzip src="../android/libs/Mobclix-3.2.0.jar" dest="../bin/ndroid/temp/zip" />
+        <unzip src="../android/libs/Mobclix-3.2.0.jar" dest="../bin/android/temp/zip" />
 		<copydir src="../bin/android/temp/zip/com" dest="../bin/android/temp/classes/com"/>
 
         <jar basedir="../bin/android/temp/classes" destfile="../bin/android/lib${name}.jar"/>
