@@ -31,9 +31,9 @@ public class FetchAdFunction implements FREFunction {
 		try {
 			String sizeString = arg1[1].getAsString();
 			
-			if (sizeString == "BANNER_TOP")
+			if (sizeString.equals("BANNER_TOP"))
 				size = FlurryAdSize.BANNER_TOP;
-			else if (sizeString == "BANNER_BOTTOM")
+			else if (sizeString.equals("BANNER_BOTTOM"))
 				size = FlurryAdSize.BANNER_BOTTOM;
 			else
 				size = FlurryAdSize.FULLSCREEN;
