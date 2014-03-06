@@ -198,27 +198,27 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 	public void onAdOpened(String myAdSpaceName)
 	{
 		Log.i(Extension.TAG, "Ad opened: " + myAdSpaceName);
-		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_AD_OPENED", myAdSpaceName);
 	}
 	
 	@Override
 	public void onAdClicked(String myAdSpaceName)
 	{
 		Log.i(Extension.TAG, "Ad clicked: " + myAdSpaceName);
-		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_AD_CLICKED", myAdSpaceName);
 	}
 	
 	@Override 
 	public void onVideoCompleted(String myAdSpaceName)
 	{
 		Log.i(Extension.TAG, "Video opened: " + myAdSpaceName);
-		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_VIDEO_COMPLETED", myAdSpaceName);
 	}
 
 	@Override
 	public void onRendered(String myAdSpaceName)
 	{
 		Log.i(Extension.TAG, "Ad rendered: " + myAdSpaceName);
-		dispatchStatusEventAsync("SPACE_DID_FAIL_TO_RECEIVE_AD", myAdSpaceName);
+		dispatchStatusEventAsync("SPACE_AD_RENDERED", myAdSpaceName);
 	}
 }

@@ -121,7 +121,7 @@ package com.freshplanet.nativeExtensions
 			if(!additionnalMessages)
 				additionnalMessages = [];
 			
-			logger(message + additionnalMessages.join(" "));
+			logger(message + " " + additionnalMessages.join(" "));
 		}
 		
 		

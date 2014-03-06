@@ -9,11 +9,11 @@ package com.freshplanet.nativeExtensions
 		public static const SPACE_DID_FAIL_TO_RENDER:String = "SPACE_DID_FAIL_TO_RENDER";
 		public static const SPACE_DID_FAIL_TO_RECEIVE_AD:String = "SPACE_DID_FAIL_TO_RECEIVE_AD";
 		public static const SPACE_DID_RECEIVE_AD:String = "SPACE_DID_RECEIVE_AD";
-		/** Android only. */
-		public static const SPACE_AD_OPENED:String = "SPACE_AD_OPENED";
 		public static const SPACE_AD_CLICKED:String = "SPACE_AD_CLICKED";
 		public static const SPACE_VIDEO_COMPLETED:String = "SPACE_VIDEO_COMPLETED";
-		/** Android only. */
+		
+		// ANDROID ONLY
+		public static const SPACE_AD_OPENED:String = "SPACE_AD_OPENED";
 		public static const SPACE_AD_RENDERED:String = "SPACE_AD_RENDERED";
 		
 		// IOS ONLY
