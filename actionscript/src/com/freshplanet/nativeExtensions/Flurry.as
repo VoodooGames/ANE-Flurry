@@ -339,14 +339,14 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function startSession():void
 		{
-			trace('start session');
+			log('start session');
 			if (isFlurrySupported)
 			{
 				
 				var apiKey:String = getApiKeyFromDevice();
 				if (apiKey != null)
 				{
-					trace('start session with api key'+apiKey);
+					log('start session with api key'+apiKey);
 					extCtx.call("startSession", apiKey)
 				} else
 				{
