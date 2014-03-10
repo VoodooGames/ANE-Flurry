@@ -498,5 +498,25 @@ package com.freshplanet.nativeExtensions
 			log((enable ? "En" : "Dis") + "abling test ads...");
 			extCtx.call("enableTestAds", enable);
 		}
+		
+		/**
+		 * Returns the height of the displayed ad for the given space.
+		 */
+		public function getDisplayedAdHeight(space:String):int {
+			if (!isFlurrySupported)
+				return 0;
+			
+			var adHeight:int = 0;
+			try {
+				adHeight = int(extCtx.call("getDisplayedAdHeight", space));
+				log("Displayed ad height for space " + space + " : " + adHeight);
+			}
+			catch(e:Error) {
+				log("Failed to get ad height for space " + space + " : " + e);
+			}
+			
+			return adHeight;
+		}
+			
 	}
 }

@@ -39,6 +39,7 @@ import com.freshplanet.flurry.functions.ads.ClearTargetingKeywordsFunction;
 import com.freshplanet.flurry.functions.ads.DisplayAdFunction;
 import com.freshplanet.flurry.functions.ads.EnableTestAdsFunction;
 import com.freshplanet.flurry.functions.ads.FetchAdFunction;
+import com.freshplanet.flurry.functions.ads.GetDisplayedAdHeightFunction;
 import com.freshplanet.flurry.functions.ads.IsAdReadyFunction;
 import com.freshplanet.flurry.functions.ads.RemoveAdFunction;
 import com.freshplanet.flurry.functions.analytics.LogErrorFunction;
@@ -96,6 +97,7 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 		functionMap.put("clearCookie", new ClearCookieFunction());
 		functionMap.put("addTargetingKeyword", new AddTargetingKeywordFunction());
 		functionMap.put("clearTargetingKeywords", new ClearTargetingKeywordsFunction());
+		functionMap.put("getDisplayedAdHeight", new GetDisplayedAdHeightFunction());
 		
 		return functionMap;	
 	}
@@ -165,7 +167,6 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 		if(mainContainer.indexOfChild(layout) >= 0)
 			mainContainer.removeView(layout);
 	}
-	
 	
 	
 	// User cookies

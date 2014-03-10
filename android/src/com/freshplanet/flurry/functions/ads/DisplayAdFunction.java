@@ -53,6 +53,8 @@ public class DisplayAdFunction implements FREFunction {
 		
 		Log.i(Extension.TAG, "Displaying ad for space : " + space + " on layout : " + layout + " ...");
 		FlurryAds.displayAd(context.getActivity(), space, layout);
+		
+		Log.i(Extension.TAG, "Displayed ad, height is : " + layout.getHeight());
 
 		return null;
 	}
