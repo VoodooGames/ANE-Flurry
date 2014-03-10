@@ -103,6 +103,8 @@ static id sharedInstance = nil;
 
 - (void)startSession:(NSString *)apiKey
 {
+    NSLog(@"Starting Flurry session");
+    
     _applicationWindow = [[[UIApplication sharedApplication] keyWindow] retain];
     
     [Flurry setDebugLogEnabled:YES];
@@ -195,6 +197,7 @@ static id sharedInstance = nil;
     [self setStatus:YES forSpace:space];
     if (size == FULLSCREEN) _interstitialDisplayed = [space retain];
     else [self.rootView addSubview:adView];
+    
     [FlurryAds displayAdForSpace:space onView:adView];
 }
 
@@ -671,70 +674,10 @@ DEFINE_ANE_FUNCTION(stopTimedEvent)
 
 #pragma mark - C interface - Ads
 
-/*DEFINE_ANE_FUNCTION(showAd)
-{
-    NSString *space = nil;
-    FlurryAdSize sizeValue;
-    int64_t timeout;
-    uint32_t stringLength;
-    
-    // Retrieve the ad space name
-    const uint8_t *spaceString;
-    if (FREGetObjectAsUTF8(argv[0], &stringLength, &spaceString) == FRE_OK)
-    {
-        space = [NSString stringWithUTF8String:(char*)spaceString];
-    }
-    
-    // Retrieve the ad size
-    const uint8_t *sizeString;
-    if (FREGetObjectAsUTF8(argv[1], &stringLength, &sizeString) == FRE_OK)
-    {
-        NSString *size = [NSString stringWithUTF8String:(char*)sizeString];
-        
-        if ([size isEqualToString:@"BANNER_TOP"]) sizeValue = BANNER_TOP;
-        else if ([size isEqualToString:@"BANNER_BOTTOM"]) sizeValue = BANNER_BOTTOM;
-        else sizeValue = FULLSCREEN;
-    }
-    else
-    {
-        NSLog(@"[Flurry] showAd - Couldn't retrieve ad size. Defaulting to fullscreen.");
-        sizeValue = FULLSCREEN;
-    }
-    
-    // Retrieve the timeout
-    int32_t timeout32;
-    if (FREGetObjectAsInt32(argv[2], &timeout32) == FRE_OK)
-    {
-        timeout = (int64_t)timeout32;
-    }
-    else
-    {
-        NSLog(@"[Flurry] showAd - Couldn't retrieve timout. Defaulting to 0 (asynchronous).");
-        timeout = 0;
-    }
-    
-    if (space != nil)
-    {
-        // Try to show an ad
-        BOOL isAdAvailable = [[AirFlurry sharedInstance] showAdForSpace:space size:sizeValue timeout:timeout];
-        
-        // Return the result (YES is the ad was shown, NO otherwise)
-        FREObject result;
-        if (FRENewObjectFromBool(isAdAvailable, &result) == FRE_OK)
-        {
-            return result;
-        }
-        else
-        {
-            NSLog(@"[Flurry] showAd - Couldn't get ad availability. Assuming it was unavailable.");
-        }
-    }
-    
-    return nil;
-}*/
-
 DEFINE_ANE_FUNCTION(fetchAd)
 {
+    NSLog(@"[Flurry] Calling fetchAd");
+    
     NSString *space = nil;
     FlurryAdSize sizeValue;
     uint32_t stringLength;
@@ -746,6 +689,8 @@ DEFINE_ANE_FUNCTION(fetchAd)
         space = [NSString stringWithUTF8String:(char*)spaceString];
     }
     
+    NSLog(@"Ad space : %@", space);
+    
     // Retrieve the ad size
     const uint8_t *sizeString;
     if (FREGetObjectAsUTF8(argv[1], &stringLength, &sizeString) == FRE_OK)
@@ -754,13 +699,19 @@ DEFINE_ANE_FUNCTION(fetchAd)
         
         if ([size isEqualToString:@"BANNER_TOP"]) sizeValue = BANNER_TOP;
         else if ([size isEqualToString:@"BANNER_BOTTOM"]) sizeValue = BANNER_BOTTOM;
-        else sizeValue = FULLSCREEN;
+        else if ([size isEqualToString:@"FULLSCREEN"]) sizeValue = FULLSCREEN;
+        else {
+            NSLog(@"[Flurry] Error while fetching ad : wrong size : %@", size);
+            return nil;
+        }
     }
     else
     {
-        NSLog(@"[Flurry] showAd - Couldn't retrieve ad size. Defaulting to fullscreen.");
-        sizeValue = FULLSCREEN;
+        NSLog(@"[Flurry] Error while fetching ad : couldn't retrieve ad size.");
+        return nil;
     }
+    
+    NSLog(@"[Flurry] Ad size : %u", sizeValue);
     
     if (space != nil)
     {
@@ -772,6 +723,8 @@ DEFINE_ANE_FUNCTION(fetchAd)
 
 DEFINE_ANE_FUNCTION(isAdReady)
 {
+    NSLog(@"[Flurry] Calling isAdReady");
+    
     NSString *space = nil;
     uint32_t stringLength;
     
@@ -782,8 +735,12 @@ DEFINE_ANE_FUNCTION(isAdReady)
         space = [NSString stringWithUTF8String:(char*)spaceString];
     }
     
-    FREObject result;
-    FRENewObjectFromBool([FlurryAds adReadyForSpace:space], result);
+    NSLog(@"Ad space : %@", space);
+    
+    FREObject result = nil;
+    
+    BOOL adReady = [FlurryAds adReadyForSpace:space];
+    FRENewObjectFromBool(adReady, &result);
     return result;
 }
 
@@ -810,12 +767,16 @@ DEFINE_ANE_FUNCTION(displayAd)
         
         if ([size isEqualToString:@"BANNER_TOP"]) sizeValue = BANNER_TOP;
         else if ([size isEqualToString:@"BANNER_BOTTOM"]) sizeValue = BANNER_BOTTOM;
-        else sizeValue = FULLSCREEN;
+        else if ([size isEqualToString:@"FULLSCREEN"]) sizeValue = FULLSCREEN;
+        else {
+            NSLog(@"[Flurry] Error while displaying ad : wrong size : %@", size);
+            return nil;
+        }
     }
     else
     {
-        NSLog(@"[Flurry] showAd - Couldn't retrieve ad size. Defaulting to fullscreen.");
-        sizeValue = FULLSCREEN;
+        NSLog(@"[Flurry] Error while displaying ad : couldn't retrieve ad size.");
+        return nil;
     }
 
     [[AirFlurry sharedInstance] displayAdForSpace:space size:sizeValue];
