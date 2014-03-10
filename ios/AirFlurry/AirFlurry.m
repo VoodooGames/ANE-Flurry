@@ -100,7 +100,6 @@ static id sharedInstance = nil;
 
 
 #pragma mark - Analytics
-
 - (void)startSession:(NSString *)apiKey
 {
     NSLog(@"Starting Flurry session");
@@ -109,7 +108,7 @@ static id sharedInstance = nil;
     
     [Flurry setDebugLogEnabled:YES];
     [Flurry startSession:apiKey];
-    
+
     [FlurryAds setAdDelegate:self];
     [FlurryAds initialize:_applicationWindow.rootViewController];
     
@@ -144,16 +143,36 @@ static id sharedInstance = nil;
     if (!_bannerContainer)
     {
         CGRect bannerFrame = CGRectZero;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        {
-            bannerFrame.size = CGSizeMake(728, 90);
-        }
-        else
-        {
-            bannerFrame.size = CGSizeMake(320, 50);
+        
+        CGFloat sw = [UIScreen mainScreen].bounds.size.width;
+        CGFloat sh = [UIScreen mainScreen].bounds.size.height;
+        
+        CGFloat smin = sw;
+        
+        if (sh < sw)
+            smin = sh;
+
+        CGFloat bannerWidth;
+        CGFloat bannerHeight;
+
+        if (smin <= 320) {
+            bannerWidth = 320;
+            bannerHeight = 50;
+        } else if (smin <= 640) {
+            bannerWidth = 640;
+            bannerHeight = 100;
+        } else if (smin <= 768) {
+            bannerWidth = 728;
+            bannerHeight = 90;
+        } else {
+            bannerWidth = 1456;
+            bannerHeight = 180;
         }
         
+        bannerFrame.size = CGSizeMake(bannerWidth, bannerHeight);
+        
         _bannerContainer = [[UIView alloc] initWithFrame:bannerFrame];
+        
     }
     
     return _bannerContainer;
@@ -192,6 +211,14 @@ static id sharedInstance = nil;
         CGRect bannerFrame = adView.frame;
         bannerFrame.origin.y = (size == BANNER_BOTTOM) ? self.rootView.bounds.size.height - bannerFrame.size.height : 0;
         adView.frame = bannerFrame;
+    }
+    
+    if (size == BANNER_BOTTOM) {
+        self.bannerContainer.contentMode = UIViewContentModeBottom;
+    } else if (size == BANNER_TOP) {
+        self.bannerContainer.contentMode = UIViewContentModeTop;
+    } else if (size == FULLSCREEN) {
+        self.rootView.contentMode = UIViewContentModeScaleToFill;
     }
     
     [self setStatus:YES forSpace:space];
@@ -873,6 +900,38 @@ DEFINE_ANE_FUNCTION(enableTestAds)
     return nil;
 }
 
+DEFINE_ANE_FUNCTION(getDisplayedAdHeight)
+{
+    NSString *space = nil;
+    uint32_t stringLength;
+    
+    FREObject result = nil;
+    FRENewObjectFromInt32(0, &result);
+    
+    // Retrieve the ad space name
+    const uint8_t *spaceString;
+    if (FREGetObjectAsUTF8(argv[0], &stringLength, &spaceString) == FRE_OK)
+    {
+        space = [NSString stringWithUTF8String:(char*)spaceString];
+    } else {
+        FRENewObjectFromInt32(0, &result);
+        return result;
+    }
+    
+    UIView* bannerView = [AirFlurry sharedInstance].bannerContainer;
+    
+    for(UIView* view in bannerView.subviews) {
+        NSLog(@"Subview size : %f, %f", view.bounds.size.width, view.bounds.size.height);
+        NSLog(@"Subview transforms : %f, %f, %f, %f", view.transform.a, view.transform.b, view.transform.c, view.transform.d);
+        NSLog(@"Subview content scale factor : %f", view.contentScaleFactor);
+    }
+    
+    NSLog(@"Transform : %f, %f, %f, %f", bannerView.transform.a, bannerView.transform.b, bannerView.transform.c, bannerView.transform.d);
+    NSLog(@"Content scale factor : %f", bannerView.contentScaleFactor);
+    
+    FRENewObjectFromInt32([AirFlurry sharedInstance].bannerContainer.bounds.size.height, &result);
+    return result;
+}
 
 #pragma mark - ANE setup
 
@@ -903,7 +962,8 @@ void AirFlurryContextInitializer(void* extData, const uint8_t* ctxType, FREConte
         MAP_FUNCTION(clearUserCookies, NULL),
         MAP_FUNCTION(addTargetingKeyword, NULL),
         MAP_FUNCTION(clearTargetingKeywords, NULL),
-        MAP_FUNCTION(enableTestAds, NULL)
+        MAP_FUNCTION(enableTestAds, NULL),
+        MAP_FUNCTION(getDisplayedAdHeight, NULL)
     };
     
 	*numFunctionsToTest = sizeof( functionMap ) / sizeof( FRENamedFunction );

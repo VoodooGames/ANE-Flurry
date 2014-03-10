@@ -65,7 +65,7 @@ DEFINE_ANE_FUNCTION(clearUserCookies);
 DEFINE_ANE_FUNCTION(addTargetingKeyword);
 DEFINE_ANE_FUNCTION(clearTargetingKeywords);
 DEFINE_ANE_FUNCTION(enableTestAds);
-
+DEFINE_ANE_FUNCTION(getDisplayedAdHeight);
 
 // ANE setup
 void AirFlurryContextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, 
