@@ -1,6 +1,7 @@
 package com.freshplanet.flurry.functions.ads;
 
 import android.util.Log;
+import android.widget.FrameLayout;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
@@ -40,14 +41,15 @@ public class FetchAdFunction implements FREFunction {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			Log.i(Extension.TAG, "Couldn't retrieve ad size. Defaulting to fullscreen.");
-			size = FlurryAdSize.FULLSCREEN;
+			Log.i(Extension.TAG, "fetchAd() : invalid size !");
+			return null;
 		}
 		
 		ExtensionContext context = (ExtensionContext)arg0;
+		FrameLayout layout = context.getAdLayout(space);
 		
-		Log.i(Extension.TAG, "Fetching ad for space : " + space + " using size " + size + " ...");
-		FlurryAds.fetchAd(context.getActivity(), space,  context.getNewAdLayout(), size);
+		Log.i(Extension.TAG, "Fetching ad for space : " + space + " using size " + size + ", on layout : " + layout + " ...");
+		FlurryAds.fetchAd(context.getActivity(), space, layout, size);
 		
 		return null;
 	}

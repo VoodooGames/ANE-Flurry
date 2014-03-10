@@ -19,7 +19,7 @@
 package com.freshplanet.flurry.functions.ads;
 
 import android.util.Log;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
@@ -47,12 +47,14 @@ public class RemoveAdFunction implements FREFunction
 			return null;
 		}
 		
-		// Update space status
 		ExtensionContext context = (ExtensionContext)arg0;
+		FrameLayout layout = context.getAdLayout(space);
 		
-		// Remove the ad
-		RelativeLayout adLayout = context.getCurrentAdLayout();
-		FlurryAds.removeAd(context.getActivity(), space, adLayout);
+		Log.i(Extension.TAG, "Remove ad for space : " + space + " on layout " + layout + " ...");
+		FlurryAds.removeAd(context.getActivity(), space, layout);
+		
+		Log.i(Extension.TAG, "Hiding layout " + layout + " ...");
+		context.hideAdLayout(space);
 		
 		return null;
 	}

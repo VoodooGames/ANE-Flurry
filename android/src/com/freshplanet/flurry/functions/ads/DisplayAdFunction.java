@@ -1,6 +1,7 @@
 package com.freshplanet.flurry.functions.ads;
 
 import android.util.Log;
+import android.widget.FrameLayout;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
@@ -26,9 +27,13 @@ public class DisplayAdFunction implements FREFunction {
 		}
 
 		ExtensionContext context = (ExtensionContext)arg0;
-
-		Log.i(Extension.TAG, "Displaying ad for space : " + space + " ...");
-		FlurryAds.displayAd(context.getActivity(), space,  context.getCurrentAdLayout());
+		FrameLayout layout = context.getAdLayout(space);
+		
+		Log.i(Extension.TAG, "Showing layout " + layout + " ...");
+		context.showAdLayout(space);
+		
+		Log.i(Extension.TAG, "Displaying ad for space : " + space + " on layout : " + layout + " ...");
+		FlurryAds.displayAd(context.getActivity(), space, layout);
 
 		return null;
 	}

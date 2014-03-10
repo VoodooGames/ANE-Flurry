@@ -411,7 +411,7 @@ package com.freshplanet.nativeExtensions
 		{
 			if (!isFlurrySupported) return;
 			log('Fetch ad "'+space+'" with size "'+size+'"');
-			extCtx.call('fetchAd', space, size);
+			extCtx.call("fetchAd", space, size);
 		}
 		
 		/**
@@ -433,7 +433,7 @@ package com.freshplanet.nativeExtensions
 		{
 			if (!isFlurrySupported) return;
 			log('Display ad "'+space+'" with size "' + size + '"');
-			extCtx.call('displayAd', space, size);
+			extCtx.call("displayAd", space, size);
 		}
 		
 		/**
@@ -445,7 +445,7 @@ package com.freshplanet.nativeExtensions
 		{
 			if (!isFlurrySupported) return;
 			log('Remove ad "'+space+'"');
-			extCtx.call('removeAd', space);
+			extCtx.call("removeAd", space);
 		}
 		
 		/**
@@ -495,7 +495,7 @@ package com.freshplanet.nativeExtensions
 		 */
 		public function enableTestAds(enable:Boolean):void {
 			if (!isFlurrySupported) return;
-			log("Enabling test ads...");
+			log((enable ? "En" : "Dis") + "abling test ads...");
 			extCtx.call("enableTestAds", enable);
 		}
 	}

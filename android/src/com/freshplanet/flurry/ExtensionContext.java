@@ -22,10 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
-import android.widget.RelativeLayout;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
@@ -53,8 +53,8 @@ import com.freshplanet.flurry.functions.analytics.StopTimedEventFunction;
 
 public class ExtensionContext extends FREContext implements FlurryAdListener
 {
-	private RelativeLayout _adLayout = null;
-	
+	private ViewGroup _mainContainer = null;
+	private Map<String, FrameLayout> _adLayouts = null;
 	private Map<String, String> _userCookies = null;
 	private Map<String, String> _targetingKeywords = null;
 	
@@ -100,28 +100,63 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 	}
 	
 	
-	// Ad layout
+	////////////////
+	// AD LAYOUTS //
+	////////////////
 	
-	public RelativeLayout getNewAdLayout()
-	{
-		// Retrieve the game container
-		ViewGroup mainContainer = (ViewGroup)getActivity().findViewById(android.R.id.content);
-		mainContainer = (ViewGroup)mainContainer.getChildAt(0);
+	/**
+	 * Returns the main container.
+	 */
+	public ViewGroup getMainContainer() {
+		if(_mainContainer == null)
+			_mainContainer = (ViewGroup) ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);
 		
-		// Remove the previous ad layout (if any)
-		if (_adLayout != null) mainContainer.removeView(_adLayout);
-		
-		// Create a new ad layout
-		_adLayout = new RelativeLayout(getActivity());
-		mainContainer.addView(_adLayout, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		
-		return _adLayout;
+		return _mainContainer;
 	}
 	
-	public RelativeLayout getCurrentAdLayout()
-	{
-		return _adLayout;
+	/**
+	 * Returns a list of all registered add layouts (for each size).
+	 */
+	public Map<String, FrameLayout> getAdLayouts() {
+		if (_adLayouts == null)
+			_adLayouts = new HashMap<String, FrameLayout>();
+		
+		return _adLayouts;
 	}
+	
+	/**
+	 * Returns an ad layout for the given space. If none exists, one is created.
+	 */
+	public FrameLayout getAdLayout(String space) {
+		Map<String, FrameLayout> adLayouts = getAdLayouts();
+		if(!adLayouts.containsKey(space)) 
+			adLayouts.put(space, new FrameLayout(getActivity()));
+		
+		return adLayouts.get(space);
+	}
+	
+	/**
+	 * Adds the ad layout to the main app container. 
+	 */
+	public void showAdLayout(String space) {
+		FrameLayout layout = getAdLayout(space);
+		ViewGroup mainContainer = getMainContainer();
+		
+		if(mainContainer.indexOfChild(layout) == -1)
+			mainContainer.addView(layout, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM));
+	}
+	
+	/**
+	 * Removes the ad layout to the main app container.
+	 */
+	public void hideAdLayout(String space) {
+		FrameLayout layout = getAdLayout(space);
+		ViewGroup mainContainer = getMainContainer();
+		
+		if(mainContainer.indexOfChild(layout) >= 0)
+			mainContainer.removeView(layout);
+	}
+	
 	
 	
 	// User cookies
