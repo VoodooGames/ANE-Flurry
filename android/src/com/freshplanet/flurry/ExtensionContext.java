@@ -30,6 +30,7 @@ import android.widget.FrameLayout.LayoutParams;
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.flurry.android.FlurryAdListener;
+import com.flurry.android.FlurryAdSize;
 import com.flurry.android.FlurryAdType;
 import com.freshplanet.flurry.functions.ads.AddTargetingKeywordFunction;
 import com.freshplanet.flurry.functions.ads.AddUserCookieFunction;
@@ -138,12 +139,20 @@ public class ExtensionContext extends FREContext implements FlurryAdListener
 	/**
 	 * Adds the ad layout to the main app container. 
 	 */
-	public void showAdLayout(String space) {
+	public void showAdLayout(String space, FlurryAdSize size) {
 		FrameLayout layout = getAdLayout(space);
 		ViewGroup mainContainer = getMainContainer();
 		
+		FrameLayout.LayoutParams params;
+		if(size == FlurryAdSize.BANNER_BOTTOM)
+			params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM);
+		else if(size == FlurryAdSize.BANNER_TOP)
+			params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL|Gravity.TOP);
+		else
+			params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+		
 		if(mainContainer.indexOfChild(layout) == -1)
-			mainContainer.addView(layout, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM));
+			mainContainer.addView(layout, params);
 	}
 	
 	/**
