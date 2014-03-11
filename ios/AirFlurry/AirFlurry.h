@@ -38,7 +38,7 @@
 - (void)clearUserCookies;
 - (void)addTargetingKeywordWithValue:(NSString *)value forKey:(NSString *)key;
 - (void)clearTargetingKeywords;
-
+- (void)adDidRender:(NSString *)adSpace;
 @end
 
 

@@ -18,6 +18,7 @@
 
 #import "AirFlurry.h"
 #import "Flurry.h"
+#import "BannerView.h"
 
 FREContext AirFlurryCtx = nil;
 
@@ -37,7 +38,7 @@ FREContext AirFlurryCtx = nil;
 }
 
 @property (nonatomic, readonly) UIView *rootView;
-@property (nonatomic, readonly) UIView *bannerContainer;
+@property (nonatomic, readonly) BannerView *bannerContainer;
 @property (nonatomic, readonly) NSMutableDictionary *spacesStatus;
 
 - (void)onWindowDidBecomeKey:(NSNotification *)notification;
@@ -138,14 +139,15 @@ static id sharedInstance = nil;
     return [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
 }
 
-- (UIView *)bannerContainer
+- (BannerView *)bannerContainer
 {
     if (!_bannerContainer)
     {
         CGRect bannerFrame = CGRectZero;
         
-        CGFloat sw = [UIScreen mainScreen].bounds.size.width;
-        CGFloat sh = [UIScreen mainScreen].bounds.size.height;
+        float scaleFactor = [[UIScreen mainScreen] scale];
+        CGFloat sw = [UIScreen mainScreen].bounds.size.width * scaleFactor;
+        CGFloat sh = [UIScreen mainScreen].bounds.size.height * scaleFactor;
         
         CGFloat smin = sw;
         
@@ -169,9 +171,9 @@ static id sharedInstance = nil;
             bannerHeight = 180;
         }
         
-        bannerFrame.size = CGSizeMake(bannerWidth, bannerHeight);
+        bannerFrame.size = CGSizeMake(bannerWidth/scaleFactor, bannerHeight/scaleFactor);
         
-        _bannerContainer = [[UIView alloc] initWithFrame:bannerFrame];
+        _bannerContainer = [[BannerView alloc] initWithFrame:bannerFrame];
         
     }
     
@@ -211,6 +213,8 @@ static id sharedInstance = nil;
         CGRect bannerFrame = adView.frame;
         bannerFrame.origin.y = (size == BANNER_BOTTOM) ? self.rootView.bounds.size.height - bannerFrame.size.height : 0;
         adView.frame = bannerFrame;
+        self.bannerContainer.space = space;
+
     }
     
     if (size == BANNER_BOTTOM) {
@@ -246,6 +250,9 @@ static id sharedInstance = nil;
     }
     else
     {
+        //[self.bannerContainer.space release];
+        self.bannerContainer.space = nil;
+        
         [self.bannerContainer removeFromSuperview];
     }
     
@@ -393,7 +400,7 @@ static id sharedInstance = nil;
 {
     NSLog(@"[Flurry] Space did receive click : %@", adSpace);
     
-    if (AirFlurryCtx != nil)
+    if (AirFlurryCtx != nil && _interstitialDisplayed == nil)
     {
         FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_AD_CLICKED", (const uint8_t *)[adSpace UTF8String]);
     }
@@ -406,6 +413,15 @@ static id sharedInstance = nil;
     if (AirFlurryCtx != nil)
     {
         FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_VIDEO_COMPLETED", (const uint8_t *)[adSpace UTF8String]);
+    }
+}
+
+- (void)adDidRender:(NSString *)adSpace {
+    NSLog(@"[Flurry] Ad did render : %@", adSpace);
+    
+    if (AirFlurryCtx != nil)
+    {
+        FREDispatchStatusEventAsync(AirFlurryCtx, (const uint8_t *)"SPACE_AD_RENDERED", (const uint8_t *)[adSpace UTF8String]);
     }
 }
 
@@ -918,18 +934,7 @@ DEFINE_ANE_FUNCTION(getDisplayedAdHeight)
         return result;
     }
     
-    UIView* bannerView = [AirFlurry sharedInstance].bannerContainer;
-    
-    for(UIView* view in bannerView.subviews) {
-        NSLog(@"Subview size : %f, %f", view.bounds.size.width, view.bounds.size.height);
-        NSLog(@"Subview transforms : %f, %f, %f, %f", view.transform.a, view.transform.b, view.transform.c, view.transform.d);
-        NSLog(@"Subview content scale factor : %f", view.contentScaleFactor);
-    }
-    
-    NSLog(@"Transform : %f, %f, %f, %f", bannerView.transform.a, bannerView.transform.b, bannerView.transform.c, bannerView.transform.d);
-    NSLog(@"Content scale factor : %f", bannerView.contentScaleFactor);
-    
-    FRENewObjectFromInt32([AirFlurry sharedInstance].bannerContainer.bounds.size.height, &result);
+    FRENewObjectFromInt32([AirFlurry sharedInstance].bannerContainer.frame.size.height * [[UIScreen mainScreen] scale], &result);
     return result;
 }
 

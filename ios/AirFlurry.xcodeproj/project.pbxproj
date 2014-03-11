@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		340B5DC318CF4F7F0091E45C /* BannerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 340B5DC118CF4F7F0091E45C /* BannerView.h */; };
+		340B5DC418CF4F7F0091E45C /* BannerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 340B5DC218CF4F7F0091E45C /* BannerView.m */; };
 		39120B6916789BEA009F41AD /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 39120B6816789BEA009F41AD /* libz.1.2.5.dylib */; };
 		5A9BCDD9153E87040018E174 /* FlashRuntimeExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AF8AF22153DE6D8000A8447 /* FlashRuntimeExtensions.h */; };
 		5AF18021157D6EA20043C2CF /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AF18020157D6EA20043C2CF /* MediaPlayer.framework */; };
@@ -38,6 +40,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		340B5DC118CF4F7F0091E45C /* BannerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BannerView.h; sourceTree = "<group>"; };
+		340B5DC218CF4F7F0091E45C /* BannerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BannerView.m; sourceTree = "<group>"; };
+		34CB853F18CDF8CA00881BA5 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		39120B6816789BEA009F41AD /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = usr/lib/libz.1.2.5.dylib; sourceTree = SDKROOT; };
 		5AF18020157D6EA20043C2CF /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		5AF8AF12153DE65D000A8447 /* libAirFlurry.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAirFlurry.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +155,7 @@
 				FAD8E79B15E840A200BAD3C3 /* AVFoundation.framework */,
 				FAD8E79915E8409900BAD3C3 /* SystemConfiguration.framework */,
 				5AF8AF15153DE65D000A8447 /* Foundation.framework */,
+				34CB853F18CDF8CA00881BA5 /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -160,6 +166,8 @@
 				5AF8AF1A153DE65D000A8447 /* AirFlurry.h */,
 				5AF8AF1B153DE65D000A8447 /* AirFlurry.m */,
 				5AF8AF18153DE65D000A8447 /* Supporting Files */,
+				340B5DC118CF4F7F0091E45C /* BannerView.h */,
+				340B5DC218CF4F7F0091E45C /* BannerView.m */,
 			);
 			path = AirFlurry;
 			sourceTree = "<group>";
@@ -208,6 +216,7 @@
 				5A9BCDD9153E87040018E174 /* FlashRuntimeExtensions.h in Headers */,
 				FA20572D15E2AA1600030F51 /* Flurry.h in Headers */,
 				FA20572F15E2AA1600030F51 /* FlurryAdDelegate.h in Headers */,
+				340B5DC318CF4F7F0091E45C /* BannerView.h in Headers */,
 				FA20573015E2AA1600030F51 /* FlurryAds.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -246,6 +255,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 5AF8AF07153DE65D000A8447;
 			productRefGroup = 5AF8AF13153DE65D000A8447 /* Products */;
@@ -262,6 +272,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				340B5DC418CF4F7F0091E45C /* BannerView.m in Sources */,
 				5AF8AF1C153DE65D000A8447 /* AirFlurry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
